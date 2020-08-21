@@ -1,0 +1,13 @@
+#gridContainer{
+    display: grid;
+    grid-template-columns: repeat(3, 10em);
+    grid-template-rows: repeat(3, 10em);
+    grid-gap: 0.5em;
+    margin: auto;
+    width: 31em;
+    background-color: darkgrey;
+}
+
+body{
+    background-color: darkslategrey;
+}
