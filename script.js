@@ -134,14 +134,15 @@ const TicTacToe = (() => {
         gg = true;
         if(arg == "X")
         {
+            console.log(player1.name);
             winner = player1.name;
-            displayController.displayResults();
+            displayController.displayResults(player1.name);
         }
 
         if(arg == "O")
         {
             winner = player2.name;
-            displayController.displayResults();
+            displayController.displayResults(player2.name);
         }
 
         if(arg == "full" && winner == " ")
