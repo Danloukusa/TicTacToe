@@ -24,8 +24,13 @@ const GameBoard = (() => {
     let theBoard = [];
     function generateBoard(){
         let i = 0;
-        for(i = 0; i < 9; i++)
-            theBoard.push(" ");
+
+        if(theBoard.length == 9)
+            for(i = 0; i < 9; i++)
+                theBoard[i]= " ";
+        else
+            for(i = 0; i < 9; i++)
+                theBoard.push(" ");
     }
 
     function threeInARow(){
@@ -91,14 +96,23 @@ const GameBoard = (() => {
 
 // Control of game
 const TicTacToe = (() => {
-    let player1 = getName();
-    let player2 = personFactory("COMPUTER");
+    let player1 = " ";
+    let player2 = " ";
     let turn = true;
     let winner = " ";
     let gg = false;
-    function getName(){
-        let name = prompt("Please enter you name to begin.");
-        return personFactory(name);
+
+    function setNames(p1, p2){
+        player1 = personFactory(p1);
+        player2 = personFactory(p2);
+    }
+
+    function resetVal(){
+        player1 = " ";
+        player2 = " ";
+        turn = true;
+        winner = " ";
+        gg = false;
     }
 
     function selectBox(){
@@ -107,6 +121,8 @@ const TicTacToe = (() => {
         let gameTile = GameBoard.theBoard[index];
         if(gameTile == "X" || gameTile == "O" || gg)
         {
+            if(gg)
+                alert("GG");
             return;
         }
 
@@ -152,7 +168,7 @@ const TicTacToe = (() => {
 
     }
     
-    return { selectBox, player1, player2, gameOver, winner };
+    return { selectBox, player1, player2, gameOver, winner, setNames, resetVal };
 
 })();
 
@@ -170,6 +186,8 @@ const displayController = (() => {
     
             document.getElementById("gridContainer").appendChild(myButton);
         }
+        pullNames();
+        document.getElementById("reset").addEventListener("click", reset);
     }
 
     function updateTile(id, value){
@@ -187,8 +205,46 @@ const displayController = (() => {
         document.getElementById("gridContainer").appendChild(newBox);
     }
 
-    return { addEventListeners, updateTile, displayResults }
+    function pullNames(){
+        let name1 = document.getElementById("player1").value;
+        let name2 = document.getElementById("player2").value;
+        TicTacToe.setNames(name1, name2);
+        document.getElementById("player1").value = "";
+        document.getElementById("player2").value = "";
+        displayNameForm(false);
+    }
+
+    function displayNameForm(arg){
+        if(arg)
+        {
+            document.getElementById("names").style.display = "block";
+            document.getElementById("reset").style.display = "none";
+        }
+
+        else
+        {
+            document.getElementById("names").style.display = "none";
+            document.getElementById("reset").style.display = "block";
+        }
+
+    }
+
+    function reset(){
+        displayNameForm(true);
+        GameBoard.generateBoard();
+        let i = 0;
+        for(i = 0; i < 9; i++)
+        {
+            document.getElementById(i).remove();
+        }
+        TicTacToe.resetVal();
+        document.getElementById("results").remove();
+    }
+
+    return { addEventListeners, updateTile, displayResults, pullNames }
 })();
 
 
-displayController.addEventListeners();
+// displayController.addEventListeners();
+
+

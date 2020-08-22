@@ -12,6 +12,11 @@ body{
     background-color: darkslategrey;
 }
 
-button {
+#gridContainer button {
     font-size: 7em;
 }
+
+#reset{
+    display: none;
+}
+
