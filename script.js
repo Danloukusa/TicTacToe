@@ -22,6 +22,11 @@ const GameBoard = (() => {
     // 3 4 5
     // 6 7 8
     let theBoard = [];
+
+    function validIndex(val){
+        return theBoard[val] == " ";
+    }
+
     function generateBoard(){
         let i = 0;
 
@@ -91,20 +96,22 @@ const GameBoard = (() => {
     function addO(id){
         theBoard[id] = "O";
     }
-    return { theBoard, generateBoard, addX, addO, threeInARow };
+    return { theBoard, generateBoard, addX, addO, threeInARow, validIndex, boardFull };
 })();
 
 // Control of game
 const TicTacToe = (() => {
     let player1 = " ";
     let player2 = " ";
+    let p2Bot = false;
     let turn = true;
     let winner = " ";
     let gg = false;
 
-    function setNames(p1, p2){
+    function setNames(p1, p2, isBot){
         player1 = personFactory(p1);
         player2 = personFactory(p2);
+        p2Bot = isBot;
     }
 
     function resetVal(){
@@ -113,17 +120,23 @@ const TicTacToe = (() => {
         turn = true;
         winner = " ";
         gg = false;
+        p2Bot = false;
     }
 
     function selectBox(){
+        let index;
         // If box already occupied, return!
-        let index = this.id;
+        if (arguments.length == 1)
+            index = this.id;
+        if(arguments.length == 2)
+            index = arguments[0];
+
         let gameTile = GameBoard.theBoard[index];
-        if(gameTile == "X" || gameTile == "O" || gg)
+        if(GameBoard.validIndex[index] || gg)
         {
             if(gg)
                 alert("GG");
-            return;
+            return false;
         }
 
         // IF player 1, push x
@@ -143,7 +156,29 @@ const TicTacToe = (() => {
     }
 
     function switchTurn(){
+
         turn = !turn;
+
+        // BOT turn
+        if(p2Bot && !turn)
+        {
+            //botTurn();
+            if(GameBoard.boardFull())
+                return;
+            if(gg)
+                return;
+            let val;
+            let move;
+            do{
+                val = Math.floor(Math.random() * 9);
+             //   alert(val);
+                move = GameBoard.validIndex(val); 
+             //   alert(move);
+             //   alert("Boogaloo");
+            }while(!move)
+            selectBox(val, 0);
+        }
+
     }
 
     function gameOver(arg){
@@ -174,6 +209,11 @@ const TicTacToe = (() => {
 
 const displayController = (() => {
     function addEventListeners(){
+        if(document.getElementById("player1").value == false
+        || document.getElementById("player2").value == false
+        ||
+        (document.getElementById("bot").checked == false && document.getElementById("notBot").checked == false)
+            )    return;
         let i = 0;
         GameBoard.generateBoard();
         for (i = 0; i < 9; i++)
@@ -208,9 +248,12 @@ const displayController = (() => {
     function pullNames(){
         let name1 = document.getElementById("player1").value;
         let name2 = document.getElementById("player2").value;
-        TicTacToe.setNames(name1, name2);
+        let isBot = document.getElementById("bot").checked;
+        TicTacToe.setNames(name1, name2, isBot);
         document.getElementById("player1").value = "";
         document.getElementById("player2").value = "";
+        document.getElementById("bot").checked = false;
+        document.getElementById("notBot").checked = false;
         displayNameForm(false);
     }
 
@@ -238,7 +281,8 @@ const displayController = (() => {
             document.getElementById(i).remove();
         }
         TicTacToe.resetVal();
-        document.getElementById("results").remove();
+        if(document.getElementById("results") != null)
+            document.getElementById("results").remove();
     }
 
     return { addEventListeners, updateTile, displayResults, pullNames }
